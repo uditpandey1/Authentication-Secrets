@@ -192,7 +192,7 @@ app.post("/login", function (req, res) {
 app.post("/submit", function (req, res) {
 
   const submittedSecret = req.body.secret;
-
+console.log(req.user);
   User.findById(req.user.id, function (err, foundUser) {
       if (err) {
           console.log(err);
