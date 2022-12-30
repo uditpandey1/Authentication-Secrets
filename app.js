@@ -23,7 +23,7 @@ app.use(session({
   secret: "Our little secret.",
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: true }
+  cookie: { secure: (process.env.NODE_ENV && process.env.NODE_ENV == 'production') ? true:false }
 }));
 
 app.use(passport.initialize());
