@@ -18,11 +18,12 @@ app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: true }));
 
 //session
-
+app.set('trust proxy', 1)
 app.use(session({
   secret: "Our little secret.",
   resave: false,
-  saveUninitialized: false
+  saveUninitialized: true,
+  cookie: { secure: true }
 }));
 
 app.use(passport.initialize());
