@@ -2,12 +2,13 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const mongoose = require("mongoose");
-const session = require('cookie-session');
+const session = require('express-session');
 const passport = require("passport");
 const passportLocalMongoose = require("passport-local-mongoose");
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const findOrCreate = require('mongoose-findorcreate');
-require('dotenv').config();
+require('dotenv').config()
+const MongoStore = require('connect-mongo')(session)
 
 const app = express();
 
@@ -20,9 +21,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 //session
 
 app.use(session({
-  secret: "Our little secret.",
+  secret: process.env.SECRET,
   resave: false,
-  saveUninitialized: false
+  saveUninitialized: false,
+  store: new MongoStore({ mongooseConnection: mongoose.connection })
 }));
 
 app.use(passport.initialize());
@@ -69,7 +71,7 @@ passport.deserializeUser(function(id, done) {
 passport.use(new GoogleStrategy({
   clientID: process.env.CLIENT_ID,
   clientSecret: process.env.CLIENT_SECRET,
-  callbackURL: "https://secrets-site.cyclic.app/auth/google/secrets"
+  callbackURL: "http://localhost:3000/auth/google/secrets"
 },
 function(accessToken, refreshToken, profile, cb) {
   User.findOrCreate({ googleId: profile.id }, function (err, user) {
@@ -191,8 +193,8 @@ app.post("/login", function (req, res) {
 app.post("/submit", function (req, res) {
 
   const submittedSecret = req.body.secret;
-console.log(req.user);
-  User.findById(req.user.id, function (err, foundUser) {
+  console.log(req.user.id);
+  User.findById(req.user._id, function (err, foundUser) {
       if (err) {
           console.log(err);
       } else {
